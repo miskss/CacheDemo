@@ -205,7 +205,61 @@ public class ControllerCacheTestService {
         controllerCacheTestService.delete(1);
     }
 ```
+## 缓存的TTL(过期时间)
+#### 1.全局的TTL设置
+```YAML
+  cache:
+    redis:
+       ## 缓存的存活时间 100 秒
+      time-to-live: 100s
+```
+#### 2.对某些cacheNames进行定制
+考虑到后期扩展，所以将需要定制的cacheName 写入到配置文件中 去。
+ ```yaml
+spring:
+  cache:
+    ##定制缓存 的到期时间
+    custom:
+      cache-key-expire-times:
+        ##myCache 的缓存时间为20s
+        myCache: 20s
+```
+定义一个spring.cache.custom.cacheKeyExpireTimes 的key,值为Map(cacheName->过期时间).
+创建一个配置文件`CacheConfigurationProperties`用于读取这些配置
+```java
+@Data
+@ConfigurationProperties(prefix = "spring.cache.custom")
+public class CacheConfigurationProperties {
+    private Map<String, Duration> cacheKeyExpireTimes = new HashMap<>();
+}
+```
+配置CacheManager
+```java
+@Configuration
+@Import({CacheConfigurationProperties.class, CacheProperties.class})
+public class RedisConfig {
 
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory, CacheConfigurationProperties properties, CacheProperties cacheProperties) {
+        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
+        for (Map.Entry<String, Duration> cacheNameAndTimeout : properties.getCacheKeyExpireTimes().entrySet()) {
+            cacheConfigurations.put(cacheNameAndTimeout.getKey(), createCacheConfiguration(cacheNameAndTimeout.getValue()));
+        }
 
+        return RedisCacheManager
+                .builder(redisConnectionFactory)
+                .cacheDefaults(createCacheConfiguration(cacheProperties.getRedis().getTimeToLive()))
+                .withInitialCacheConfigurations(cacheConfigurations).build();
+    }
+    private static RedisCacheConfiguration createCacheConfiguration(Duration timeoutInSeconds) {
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(timeoutInSeconds);
+    }
+}
+```
+## 使用缓存方法的注意事项
 
+** 绝对不要在同一类中调用缓存的方法 。**因为 Spring Cache 代理了缓存方法的访问，以使Cache Abstraction起作用，在同一个类中调用时会使代理失效。
+
+## [源码地址](https://github.com/miskss/CacheDemo)

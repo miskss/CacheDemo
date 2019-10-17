@@ -15,5 +15,4 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "spring.cache.custom")
 public class CacheConfigurationProperties {
     private Map<String, Duration> cacheKeyExpireTimes = new HashMap<>();
-
 }

@@ -14,9 +14,8 @@ spring:
       ## 还缓存null值
       cache-null-values: false
 #      ## 缓存的存活时间
-#      time-to-live: 100s
-#
+      time-to-live: 100s
 #      ##定制缓存 的到期时间
-#    custom:
-#      cache-key-expire-times:
-#        myCache: 20s
+    custom:
+      cache-key-expire-times:
+        myCache: 20s
