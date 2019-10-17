@@ -1,0 +1,17 @@
+{
+  "groups": [
+    {
+      "name": "spring.cache.custom",
+      "type": "com.example.cache.config.CacheConfigurationProperties",
+      "sourceType": "com.example.cache.config.CacheConfigurationProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "spring.cache.custom.cache-key-expire-times",
+      "type": "java.util.Map<java.lang.String,java.time.Duration>",
+      "sourceType": "com.example.cache.config.CacheConfigurationProperties"
+    }
+  ],
+  "hints": []
+}

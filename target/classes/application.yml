@@ -1,0 +1,18 @@
+server:
+  port: 1025
+spring:
+  redis:
+    database: 2
+    lettuce:
+      pool:
+        max-wait: 1000
+        max-idle: 200
+        max-active: 200
+    timeout: 1000
+  cache:
+    redis:
+      ## 缓存的存活时间
+      time-to-live: 100s
+    custom:
+      cache-key-expire-times:
+        myCache: 20s
